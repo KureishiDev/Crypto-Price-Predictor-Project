@@ -13,18 +13,18 @@ from statsmodels.tsa.arima.model import ARIMA
 from prophet import Prophet
 
 # 1. Data Collection
-crypto_symbol = 'BTC-USD'  # Bitcoin (adjust as needed)
+crypto_symbol = 'BTC-USD'  
 start_date = '2020-01-01'
 end_date = '2023-01-01'
 
 crypto_data = yf.download(crypto_symbol, start=start_date, end=end_date)
 
-# 2. Data Cleaning and Preprocessing
+
 crypto_data.dropna(inplace=True)
 scaler = MinMaxScaler(feature_range=(0, 1))
 scaled_data = scaler.fit_transform(crypto_data['Close'].values.reshape(-1, 1))
 
-# 3. Exploratory Data Analysis (EDA)
+
 plt.figure(figsize=(12, 6))
 plt.plot(crypto_data['Close'])
 plt.title(f'{crypto_symbol} Close Price')
@@ -33,7 +33,7 @@ plt.ylabel('Price (USD)')
 plt.grid(True)
 plt.show()
 
-# Calculate Moving Averages
+
 crypto_data['MA_50'] = crypto_data['Close'].rolling(window=50).mean()
 crypto_data['MA_200'] = crypto_data['Close'].rolling(window=200).mean()
 
@@ -48,16 +48,16 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-# 4. Feature Engineering (Example: Lag Features)
+
 crypto_data['Lag_1'] = crypto_data['Close'].shift(1)
 crypto_data.dropna(inplace=True)
 
-# 5. Time Series Analysis (ARIMA)
+
 model_arima = ARIMA(crypto_data['Close'], order=(5, 1, 0))
 model_arima_fit = model_arima.fit()
 forecast_arima = model_arima_fit.forecast(steps=30)
 
-# 5. Time Series Analysis (Prophet)
+
 df_prophet = crypto_data['Close'].reset_index()
 df_prophet.columns = ['ds', 'y']
 model_prophet = Prophet()
@@ -65,7 +65,7 @@ model_prophet.fit(df_prophet)
 future = model_prophet.make_future_dataframe(periods=30)
 forecast_prophet = model_prophet.predict(future)
 
-# Plot Forecasts
+
 plt.figure(figsize=(12, 6))
 plt.plot(crypto_data['Close'], label='Actual')
 plt.plot(pd.to_datetime(forecast_prophet['ds'][-30:]), forecast_prophet['yhat'][-30:], label='Prophet Forecast')
@@ -77,7 +77,7 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-# 6. Predictive Modeling (Linear Regression)
+
 features = ['Lag_1', 'MA_50', 'MA_200']
 target = 'Close'
 X_train, X_test, y_train, y_test = train_test_split(crypto_data[features], crypto_data[target], test_size=0.2, random_state=42)
@@ -95,7 +95,7 @@ plt.legend()
 plt.grid(True)
 plt.show()
 
-# 7. Predictive Modeling (LSTM)
+
 seq_length = 60
 def create_sequences(data, seq_length):
     xs = []
